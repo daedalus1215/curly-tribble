@@ -1,35 +1,42 @@
-const cluster = require('cluster');
-const e = require('express');
 const express = require('express');
+const mongoose = require('mongoose');
+const cookieSession = require('cookie-session');
+const passport = require('passport');
+const bodyParser = require('body-parser');
+const keys = require('./config/keys');
+
+require('./models/User');
+require('./models/Blog');
+require('./services/passport');
+
+mongoose.Promise = global.Promise;
+mongoose.connect(keys.mongoURI, { useMongoClient: true });
+
 const app = express();
 
+app.use(bodyParser.json());
+app.use(
+  cookieSession({
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    keys: [keys.cookieKey]
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
-console.log(cluster.isMaster);
+require('./routes/authRoutes')(app);
+require('./routes/blogRoutes')(app);
 
-// if file is being executed in master mode, then we want to .fork(), to cause
-// index.js to be executed again, but in slave mode. 
-if (cluster.isMaster) {
-    cluster.fork();
-    cluster.fork();
-    cluster.fork();
-    cluster.fork();
-} else {
+if (['production'].includes(process.env.NODE_ENV)) {
+  app.use(express.static('client/build'));
 
-    function doWork(duration) {
-        // we want to use as much cpu power as we can for some duration (in ms).
-        const start = Date.now();
-        while (Date.now() - start < duration) { }
-    }
-
-
-    app.get('/', (req, res) => {
-        doWork(5000);
-        res.send('Hi there!');
-    });
-
-    app.get('/fast', (req, res) => {
-        res.send('This was fast');
-    });
-
-    app.listen(3001);    
+  const path = require('path');
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve('client', 'build', 'index.html'));
+  });
 }
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Listening on port`, PORT);
+});
