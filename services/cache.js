@@ -30,6 +30,7 @@ mongoose.Query.prototype.exec = async function() {
     const cacheValue = await client.hget(this.hashKey, key);
 
     if (cacheValue) {
+        console.log('cacheValue!')
         const doc = JSON.parse(cacheValue);
         return Array.isArray(doc) 
             ? doc.map(d => new this.model(d))
@@ -40,3 +41,10 @@ mongoose.Query.prototype.exec = async function() {
     client.hset(this.hashKey, key, JSON.stringify(result), 'EX', 100);
     return result;
 };
+
+
+module.exports = {
+    clearHash(hashKey) {
+        client.del(JSON.stringify(hashKey)); // we are stringfying because a number or object could be passed in. 
+    }
+}
