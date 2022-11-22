@@ -4,12 +4,15 @@ const util = require('util');
 
 const redisUrl = 'redis://127.0.0.1:6379';
 const client = redis.createClient(redisUrl);
-client.get = util.promisify(client.get);
+client.hget = util.promisify(client.hget);
 const exec = mongoose.Query.prototype.exec;
 
 
-mongoose.Query.prototype.cache = function () {
+mongoose.Query.prototype.cache = function (options = {}) {
+    console.log('this.options.key', options.key);
     this.useCache = true; // keep track if consumer wants to leverage caching or not.
+    this.hashKey = JSON.stringify(options.key || 'default');  // if you pass in a key property, we are going to use that as our 'hashKey'. Stringifying so we can use it as a key. This has it so we can use something other than the ID column as our unique identifier for our cache.
+    console.log('hashKey', this.hashKey);
     return this; // make it chainable.
 };
 
@@ -23,7 +26,8 @@ mongoose.Query.prototype.exec = async function() {
         collection: this.mongooseCollection.name
     });
 
-    const cacheValue = await client.get(key);
+    // see if we have a value for 'key'
+    const cacheValue = await client.hget(this.hashKey, key);
 
     if (cacheValue) {
         const doc = JSON.parse(cacheValue);
@@ -33,6 +37,6 @@ mongoose.Query.prototype.exec = async function() {
     }
 
     const result = await exec.apply(this, arguments);
-    client.set(key, JSON.stringify(result));
+    client.hset(this.hashKey, key, JSON.stringify(result), 'EX', 100);
     return result;
 };
