@@ -14,6 +14,10 @@ beforeEach(async () => {
 
 });
 
+afterEach(async() => {
+    await browser.close();
+});
+
 test('should find header on homepage', async () => {
     // Arrange
     
