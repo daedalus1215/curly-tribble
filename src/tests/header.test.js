@@ -16,7 +16,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-    await browser.close();
+    // await browser.close();
 });
 
 test('should find header on homepage', async () => {
@@ -38,9 +38,9 @@ test('clicking login starts oauth flow', async () => {
     expect(url).toContain('https://accounts.google.com/o/oauth2/v2/auth');
 });
 
-test('when signed in, shows logout button', async () => {
+test.only('when signed in, shows logout button', async () => {
     // Arrange
-    const id = '637113ead93b0d22ba042006';
+    const id = '637ffc51b8a7018fde6e1333';
     const Buffer = require('safe-buffer').Buffer;
     const sessionObject = {
         passport: {
@@ -59,6 +59,9 @@ test('when signed in, shows logout button', async () => {
     const sig = keygrip.sign(`session=${session}`);
 
     console.log('sig', sig);
+    await page.setCookie({name: 'session', value: session})
+    await page.setCookie({name: 'session.sig', value: sig})
+    await page.goto('http://localhost:3000') // refresh after setting cookie to log us in.
 
     // Act
 
