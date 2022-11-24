@@ -1,3 +1,4 @@
+const { session } = require('passport');
 const puppeteer = require('puppeteer');
 
 let browser;
@@ -35,4 +36,31 @@ test('clicking login starts oauth flow', async () => {
 
     // Assert
     expect(url).toContain('https://accounts.google.com/o/oauth2/v2/auth');
+});
+
+test('when signed in, shows logout button', async () => {
+    // Arrange
+    const id = '637113ead93b0d22ba042006';
+    const Buffer = require('safe-buffer').Buffer;
+    const sessionObject = {
+        passport: {
+            user: id
+        }
+    }
+    const session = Buffer
+        .from(JSON.stringify(sessionObject))
+        .toString('base64')
+
+    console.log('session', session);
+    const Keygrip = require('keygrip');
+    const keys = require('../../config/keys');
+
+    const keygrip = new Keygrip([keys.cookieKey]);
+    const sig = keygrip.sign(`session=${session}`);
+
+    console.log('sig', sig);
+
+    // Act
+
+    // Assert
 });
