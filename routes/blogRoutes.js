@@ -17,11 +17,11 @@ module.exports = app => {
   app.get('/api/blogs', requireLogin, async (req, res) => {
     const blogs = await Blog
       .find({ _user: req.user.id })
-      .cache({ key: req.user.id }); // set the cache key to be the user's id.
+      // .cache({ key: req.user.id }); // set the cache key to be the user's id.
     res.send(blogs);
   });
 
-  app.post('/api/blogs', requireLogin, cleanCache, async (req, res) => {
+  app.post('/api/blogs', requireLogin, async (req, res) => {
     const { title, content } = req.body;
 
     const blog = new Blog({

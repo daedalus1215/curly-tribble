@@ -3,25 +3,23 @@ const puppeteer = require('puppeteer');
 const sessionFactories = require('./factories/sessionFactories');
 const userFactory = require('./factories/userFactory');
 
-let browser;
 let page;
-
+let browser; 
 beforeEach(async () => {
     // Arrange
     browser = await puppeteer.launch({
         headless: false
     });
+
     page = await browser.newPage();
-
-    await page.goto('http://localhost:3000'); // going to the page is going to some amount of time, so we want to await.
-
+    await page.goto('http://localhost:3000');
 });
 
 afterEach(async () => {
-    await browser.close();
+    await page.close();
 });
 
-test('should find header on homepage', async () => {
+test.only('should find header on homepage', async () => {
     // Act
     const text = await page.$eval('a.brand-logo', el => el.innerHTML);
 
