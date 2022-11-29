@@ -1,32 +1,19 @@
-const browserFactory = require('./factories/browserFactory');
-const pageFactory = require('./factories/pageFactory');
-const { getContents } = require('./helpers');
-const login = require('./helpers/login');
-
-test('should find header on homepage', async () => {
-    // Arrange
-    const browser = await browserFactory();
-    const page = await pageFactory(browser);
-
-    // Act
-    const text = await page.$eval('a.brand-logo', el => el.innerHTML);
-
-    // Assert
-    expect(text).toEqual('Blogster');
-
-    browser.close();
-});
+const {pageFactory, browserFactory} = require('./factories');
+const { getContents, login } = require('./helpers');
 
 test('clicking login starts oauth flow', async () => {
     // Arrange
     const browser = await browserFactory();
     const page = await pageFactory(browser);
 
+    const actual = await getContents(page, 'a.brand-logo');
+    expect(actual).toEqual('Blogster');
+
     // Act
     await page.click('.right a ');
-    const url = await page.url();
-
+    
     // Assert
+    const url = await page.url();
     expect(url).toContain('https://accounts.google.com/o/oauth2/v2/auth');
 
     browser.close();
