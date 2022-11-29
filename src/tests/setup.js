@@ -1,3 +1,5 @@
+jest.setTimeout(30000); // wait 30 seconds before ending any test.
+
 require('../../models/User');
 
 const mongoose = require('mongoose');
