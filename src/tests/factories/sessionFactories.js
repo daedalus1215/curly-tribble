@@ -3,6 +3,7 @@ const keys = require('../../../config/keys');
 const Buffer = require('safe-buffer').Buffer;
 
 const keygrip = new Keygrip([keys.cookieKey]);
+
 module.exports = (user) => {
     const sessionObject = {
         passport: {

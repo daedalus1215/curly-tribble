@@ -1,35 +1,26 @@
-const { session } = require('passport');
-const puppeteer = require('puppeteer');
-const sessionFactories = require('./factories/sessionFactories');
-const userFactory = require('./factories/userFactory');
-
-let page;
-let browser; 
-
-beforeEach(async () => {
-    // Arrange
-    browser = await puppeteer.launch({
-        headless: false
-    });
-
-    page = await browser.newPage();
-    await page.goto('http://localhost:3000');
-});
-
-afterEach(async () => {
-    await browser.close();
-});
+const browserFactory = require('./factories/browserFactory');
+const pageFactory = require('./factories/pageFactory');
+const { getContents } = require('./helpers');
+const login = require('./helpers/login');
 
 test('should find header on homepage', async () => {
+    // Arrange
+    const browser = await browserFactory();
+    const page = await pageFactory(browser);
+
     // Act
     const text = await page.$eval('a.brand-logo', el => el.innerHTML);
 
     // Assert
     expect(text).toEqual('Blogster');
+
+    browser.close();
 });
 
 test('clicking login starts oauth flow', async () => {
     // Arrange
+    const browser = await browserFactory();
+    const page = await pageFactory(browser);
 
     // Act
     await page.click('.right a ');
@@ -37,21 +28,21 @@ test('clicking login starts oauth flow', async () => {
 
     // Assert
     expect(url).toContain('https://accounts.google.com/o/oauth2/v2/auth');
+
+    browser.close();
 });
 
 test('when signed in, shows logout button', async () => {
-    // Arrange
-    const user = await userFactory();
-    const { session, sig } = sessionFactories(user);
-
-    await page.setCookie({ name: 'session', value: session })
-    await page.setCookie({ name: 'session.sig', value: sig })
+    //  Arrange
+    const browser = await browserFactory();
+    const page = await pageFactory(browser);
 
     // Act
-    await page.goto('http://localhost:3000') // refresh after setting cookie to log us in.
-    await page.waitForSelector('a[href="/auth/logout"]');
+    await login(page)
 
     // Assert
-    const actual = await page.$eval('a[href="/auth/logout"]', el => el.innerHTML);
+    const actual = await getContents(page, 'a[href="/auth/logout"]');
     expect(actual).toEqual('Logout');
+
+    browser.close();
 });
