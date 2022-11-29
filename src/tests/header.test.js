@@ -5,6 +5,7 @@ const userFactory = require('./factories/userFactory');
 
 let page;
 let browser; 
+
 beforeEach(async () => {
     // Arrange
     browser = await puppeteer.launch({
@@ -16,10 +17,10 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-    await page.close();
+    await browser.close();
 });
 
-test.only('should find header on homepage', async () => {
+test('should find header on homepage', async () => {
     // Act
     const text = await page.$eval('a.brand-logo', el => el.innerHTML);
 
