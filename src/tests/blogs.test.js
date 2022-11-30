@@ -1,18 +1,25 @@
 const {pageFactory, browserFactory} = require('./factories');
 const { getContents, login } = require('./helpers');
 
-test('when logged in, can see blog create form', async () => {
-    //  Arrange
-    const browser = await browserFactory();
-    const page = await pageFactory(browser);
-    await login(page)
-    await page.goto('http://localhost:3000/blogs');
+describe('when logged in', async () => {
+    let browser;
+    let page;
 
-    // Act
-    await page.click('a.btn-floating');
-    const actual = await getContents(page, 'form label');
+    beforeEach(async () => {
+        browser = await browserFactory();
+        page = await pageFactory(browser);
+        await login(page)
+        await page.goto('http://localhost:3000/blogs');
 
-    // Assert
-    expect(actual).toEqual('Blog Title');
-    browser.close();
+        await page.click('a.btn-floating')
+    });
+
+    test('can see blog create form', async () => {
+        //  Arrange & Act
+        const actual = await getContents(page, 'form label');
+    
+        // Assert
+        expect(actual).toEqual('Blog Title');
+        browser.close();
+    });
 });
