@@ -23,6 +23,31 @@ describe('when logged in', async () => {
         browser.close();
     });
 
+
+    describe('And valid inputs', async () => {
+        beforeEach(async () => {
+            await page.type('.title input', 'My Title');
+            await page.type('.content input', 'My Content');
+            await page.click('form button');
+        });
+
+        test('Submittin takes user to review screen', async () => {
+            const text = await getContents(page, 'h5');
+            expect(text).toEqual('Please confirm your entries');
+        });
+
+        test('Submittin then saving adds blog to index page', async () => {
+            await page.click('button.green');
+            await page.waitForSelector('.card');
+
+            const title = await getContents(page, '.card-title');
+            const content = await getContents(page, 'p');
+
+            expect(title).toEqual('My Title');
+            expect(content).toEqual('My Content');
+        });
+    })
+
     describe('And using invalid inputs', async () => {
         beforeEach(async () => {
             await page.click('form button');
