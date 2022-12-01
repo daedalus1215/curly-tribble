@@ -1,4 +1,4 @@
-const {pageFactory, browserFactory} = require('./factories');
+const { pageFactory, browserFactory } = require('./factories');
 const { getContents, login } = require('./helpers');
 
 describe('when logged in', async () => {
@@ -17,12 +17,11 @@ describe('when logged in', async () => {
     test('can see blog create form', async () => {
         //  Arrange & Act
         const actual = await getContents(page, 'form label');
-    
+
         // Assert
         expect(actual).toEqual('Blog Title');
         browser.close();
     });
-
 
     describe('And valid inputs', async () => {
         beforeEach(async () => {
@@ -60,5 +59,34 @@ describe('when logged in', async () => {
             expect(titleError).toEqual('You must provide a value');
             expect(contentError).toEqual('You must provide a value');
         })
+    })
+});
+
+describe('when not logged in', async () => {
+    let browser;
+    let page;
+
+    beforeEach(async () => {
+        browser = await browserFactory();
+        page = await pageFactory(browser);
+        await page.goto('http://localhost:3000/blogs');
+    });
+
+    test('User cannot create blog posts', async () => {
+        browser = await browserFactory();
+        page = await pageFactory(browser);
+
+        const actual = await page.evaluate(() => fetch('/api/blogs', {
+            method: 'post',
+            Credential: 'same-origin',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ title: 'My Title', content: 'My Content' })
+        })
+            .then(res => res.json()));
+
+        expect(actual).toEqual({error: 'You must log in!'});
+
     })
 });
