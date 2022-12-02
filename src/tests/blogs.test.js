@@ -33,6 +33,7 @@ describe('when logged in', async () => {
         test('Submittin takes user to review screen', async () => {
             const text = await getContents(page, 'h5');
             expect(text).toEqual('Please confirm your entries');
+            browser.close();
         });
 
         test('Submittin then saving adds blog to index page', async () => {
@@ -44,6 +45,7 @@ describe('when logged in', async () => {
 
             expect(title).toEqual('My Title');
             expect(content).toEqual('My Content');
+            browser.close();
         });
     })
 
@@ -58,6 +60,7 @@ describe('when logged in', async () => {
 
             expect(titleError).toEqual('You must provide a value');
             expect(contentError).toEqual('You must provide a value');
+            browser.close();
         })
     })
 });
@@ -87,6 +90,23 @@ describe('when not logged in', async () => {
             .then(res => res.json()));
 
         expect(actual).toEqual({error: 'You must log in!'});
+        browser.close();
+    });
 
-    })
+    test('User cannot get blog posts', async () => {
+        browser = await browserFactory();
+        page = await pageFactory(browser);
+
+        const actual = await page.evaluate(() => fetch('/api/blogs', {
+            method: 'GET',
+            Credential: 'same-origin',
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(res => res.json()));
+
+        expect(actual).toEqual({error: 'You must log in!'});
+        browser.close();
+    });
 });
