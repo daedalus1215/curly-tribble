@@ -1,23 +1,22 @@
 const mongoose = require('mongoose');
 const redis = require('redis');
 const util = require('util');
+const keys = require('../config/keys');
 
-const redisUrl = 'redis://127.0.0.1:6379';
+const redisUrl = keys.redis;
 const client = redis.createClient(redisUrl);
 client.hget = util.promisify(client.hget);
+
 const exec = mongoose.Query.prototype.exec;
 
 
 mongoose.Query.prototype.cache = function (options = {}) {
-    console.log('this.options.key', options.key);
     this.useCache = true; // keep track if consumer wants to leverage caching or not.
     this.hashKey = JSON.stringify(options.key || 'default');  // if you pass in a key property, we are going to use that as our 'hashKey'. Stringifying so we can use it as a key. This has it so we can use something other than the ID column as our unique identifier for our cache.
-    console.log('hashKey', this.hashKey);
     return this; // make it chainable.
 };
 
-
-mongoose.Query.prototype.exec = async function() {
+mongoose.Query.prototype.exec = async function () {
     if (!this.useCache) {
         return exec.apply(this, arguments);
     }
@@ -32,7 +31,7 @@ mongoose.Query.prototype.exec = async function() {
     if (cacheValue) {
         console.log('cacheValue!')
         const doc = JSON.parse(cacheValue);
-        return Array.isArray(doc) 
+        return Array.isArray(doc)
             ? doc.map(d => new this.model(d))
             : new this.model(doc);
     }
