@@ -1,3 +1,15 @@
+# AdvancedNodeStarter
+Starting project for a course on Advanced Node @ Udemy
+
+# External Required Services
+* MongoDB
+* Redis
+
+# Run:
+1. `yarn start` 
+2. `cd client`, then: `yarn start`
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>

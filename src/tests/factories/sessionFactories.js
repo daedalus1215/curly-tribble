@@ -14,9 +14,7 @@ module.exports = (user) => {
         .from(JSON.stringify(sessionObject))
         .toString('base64')
 
-    console.log('session', session);
 
     const sig = keygrip.sign(`session=${session}`);
-    console.log('sig', sig);
     return { session, sig };
 };

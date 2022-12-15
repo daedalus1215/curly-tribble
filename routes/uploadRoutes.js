@@ -10,7 +10,6 @@ const s3 = new AWS.S3({
 module.exports = app => {
     app.get('/api/upload', requireLogin, (req, res) => {
         const key = `${req.user.id}/${uuid.v1()}.png`;
-        console.log('keys', keys.accessKeyId)
         // Get a presigned url and respond back to the client with it.
         s3.getSignedUrl('putObject', {
             Bucket: 'my-blog-bucket-1239875',

@@ -4,7 +4,8 @@ const {
   mongoURI,
   redisURI,
   accessKeyId,
-  secretAccessKey
+  secretAccessKey,
+  bucketUrl
 } = require('./passwords.json');
 
 module.exports = {
@@ -14,5 +15,6 @@ module.exports = {
   cookieKey: '123123123',
   redis: redisURI,
   accessKeyId, // s3
-  secretAccessKey // s3
+  secretAccessKey, // s3
+  bucketUrl
 }; 
