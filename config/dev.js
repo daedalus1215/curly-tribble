@@ -12,7 +12,7 @@ module.exports = {
   googleClientSecret,
   mongoURI,
   cookieKey: '123123123',
-  redis: redisURI.
+  redis: redisURI,
   accessKeyId, // s3
   secretAccessKey // s3
 }; 
